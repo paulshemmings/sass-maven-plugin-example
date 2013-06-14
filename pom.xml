@@ -1,0 +1,143 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+	<groupId>simple.scss.demo</groupId>
+    <artifactId>simple-scss-demo</artifactId>
+	<version>1.0</version>    
+    
+    <packaging>war</packaging>
+    <name>Simple SCSS Demo project</name>
+    
+	<properties>
+    	<compass.path>${project.build.directory}/rubygems/bin/compass</compass.path>
+    	<sass.src>${basedir}/src/main/resources/assets</sass.src>
+	</properties>    
+        
+    <dependencies>
+    	<!-- java servlets -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- jdo (not used) -->
+        <dependency>
+            <groupId>javax.jdo</groupId>
+            <artifactId>jdo-api</artifactId>
+            <version>3.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.birt.runtime.3_7_1</groupId>
+            <artifactId>org.apache.commons.codec</artifactId>
+            <version>1.3.0</version>
+        </dependency>       
+        <!-- freemarker - to show the styles off -->
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.19</version>
+        </dependency>
+        <!-- unit testing (as if!) -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+        </dependency>
+        <dependency>
+            <groupId>org.datanucleus</groupId>
+            <artifactId>datanucleus-core</artifactId>
+            <version>3.2.3</version>
+        </dependency>
+	      <!-- Dependency for sass/compass compiling -->
+	    <dependency>
+	        <groupId>rubygems</groupId>
+	        <artifactId>compass</artifactId>
+	        <type>gem</type>
+	        <version>0.12.2</version>
+		</dependency>    
+		<dependency>
+	        <groupId>rubygems</groupId>
+	        <artifactId>sass</artifactId>
+	        <type>gem</type>
+	        <version>3.2.2</version>
+		</dependency>        
+    </dependencies>
+    
+    <build>
+        <finalName>simple-scss-demo</finalName>
+        <plugins>
+            <!-- sass maven plugin -->
+            <!-- http://developer.jasig.org/projects/sass-maven-plugin/1.1.1/plugin-info.html -->
+            <!-- https://github.com/Jasig/sass-maven-plugin -->
+            <!-- http://mvnrepository.com/artifact/org.jasig.maven/sass-maven-plugin/1.1.1 -->
+            <!-- https://groups.google.com/forum/?fromgroups#!topic/sass-lang/YPHqCcc_l8Y -->
+            <plugin>
+                <groupId>org.jasig.maven</groupId>
+                <artifactId>sass-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>
+                    <execution>
+                        <id>sassProcessSource</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>update-stylesheets</goal>
+                        </goals>
+                        <configuration>
+                            <!--
+                            <baseOutputDirectory>${project.build.directory}/sassOutput</baseOutputDirectory>
+                            -->
+                            <buildDirectory>${project.build.directory}</buildDirectory>
+                            <sassSourceDirectory>${basedir}/src/resources/assets/sass</sassSourceDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- run inside jetty -->
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>9.0.3.v20130506</version>
+            </plugin>
+            <!-- Plugin for sass/compass compiling -->
+            <plugin>
+                <groupId>de.saumya.mojo</groupId>
+                <artifactId>gem-maven-plugin</artifactId>
+                <version>0.28.6</version>
+            </plugin>
+        </plugins>
+    </build>
+    
+    <profiles>   
+    <!--Sass file watcher -->
+    <profile>
+      <id>watcher</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>de.saumya.mojo</groupId>
+            <artifactId>gem-maven-plugin</artifactId>
+            <extensions>true</extensions>
+            <executions>
+              <execution>
+                <id>start-watcher</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>compile</phase>
+                <configuration>
+                  <!--jrubyVersion>1.6.4</jrubyVersion -->
+                  <execArgs>${compass.path} watch ${sass.src}</execArgs>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>	
+    </profiles>
+        
+</project>
